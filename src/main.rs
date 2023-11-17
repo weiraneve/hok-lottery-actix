@@ -29,7 +29,7 @@ async fn main() -> io::Result<()> {
     HttpServer::new(move || {
         App::new()
             .app_data(shared_data.clone())
-            .service(persistence::index)
+            .service(routes::index)
     })
         .bind(server_addr)?
         .run()

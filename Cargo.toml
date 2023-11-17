@@ -11,3 +11,4 @@ mysql = "24.0.0"
 log = "0.4.20"
 serde = "1.0.192"
 chrono = { version = "0.4", features = ["serde"] }
+derive_more = "0.99.17"
