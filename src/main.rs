@@ -8,7 +8,6 @@ mod models;
 async fn main() -> io::Result<()> {
     dotenvy::dotenv().ok();
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("info"));
-
     log::info!("setting up app from environment");
 
     let server_addr = env::var("SERVER_ADDR").expect("SERVER_ADDR is not set in .env file");
@@ -20,17 +19,15 @@ async fn main() -> io::Result<()> {
     let db_port = db_port.parse().unwrap();
 
     let builder = get_conn_builder(db_user, db_password, db_host, db_port, db_name);
-
     log::info!("initializing database connection");
 
     let pool = mysql::Pool::new(builder).unwrap();
-
     let shared_data = web::Data::new(pool);
-
     log::info!("starting HTTP server at {server_addr}");
 
     HttpServer::new(move || {
         App::new()
+            .app_data(shared_data.clone())
             .service(persistence::index)
     })
         .bind(server_addr)?
