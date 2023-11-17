@@ -1,10 +1,7 @@
 use std::{io, env};
-use actix_web::{App, HttpServer, get};
+use actix_web::{App, HttpServer};
 
-#[get("/")]
-async fn index() -> String {
-    format!("Hello world")
-}
+mod persistence;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -19,7 +16,7 @@ async fn main() -> io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .service(index)
+            .service(persistence::index)
     })
         .bind(server_addr)?
         .run()
