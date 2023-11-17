@@ -3,6 +3,7 @@ use actix_web::{web, App, HttpServer};
 
 mod persistence;
 mod models;
+mod routes;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
