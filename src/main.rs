@@ -2,6 +2,7 @@ use std::{io, env};
 use actix_web::{App, HttpServer};
 
 mod persistence;
+mod models;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
