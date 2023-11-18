@@ -7,7 +7,7 @@ pub struct PostParam {
     pub encrypt_code: String,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, FromRow, Clone)]
 pub struct Hero {
     pub id: i32,
     pub name: String,
@@ -15,15 +15,7 @@ pub struct Hero {
     pub is_pick: bool,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct Log {
-    pub id: i32,
-    pub team_id: i32,
-    pub pick_group: String,
-    pub time: NaiveDateTime,
-}
-
-#[derive(Debug, FromRow)]
+#[derive(Debug, Serialize, FromRow, Clone)]
 pub struct Team {
     pub id: i32,
     pub encrypt_code: String,
@@ -32,7 +24,7 @@ pub struct Team {
     pub update_time: NaiveDateTime,
 }
 
-#[derive(Debug, Serialize, FromRow)]
+#[derive(Debug, Serialize, FromRow, Clone)]
 pub struct LogResponse {
     pub team_id: i32,
     #[serde(rename = "pickGroup")]

@@ -9,7 +9,7 @@ dotenvy = "0.15"
 env_logger = "0.10"
 sqlx = { version = "0.7.1", features = ["mysql", "runtime-tokio", "chrono"] }
 log = "0.4.20"
-chrono = { version = "0.4", features = ["serde"] }
+chrono = { version = "0.4.31", features = ["serde"] }
 serde = { version = "1.0", features = ["derive"] }
 derive_more = "0.99.17"
 actix-cors = "0.6"

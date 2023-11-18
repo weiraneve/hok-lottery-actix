@@ -17,7 +17,7 @@ async fn main() -> io::Result<()> {
 
     HttpServer::new(move || {
         let cors = Cors::default()
-            .allowed_origin_fn(|origin, _req_head| true)
+            .allowed_origin_fn(|_, _req_head| true)
             .allowed_methods(vec![http::Method::GET, http::Method::POST])
             .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
             .allowed_header(http::header::CONTENT_TYPE)
