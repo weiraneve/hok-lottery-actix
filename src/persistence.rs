@@ -1,38 +1,33 @@
-use chrono::{DateTime, Utc};
-use actix_web::{web, http::StatusCode, Responder};
-use derive_more::{Display, Error, From};
-use mysql::{params, prelude::*};
+use crate::{models::{PostParam, MyResult, Team}};
+use actix_web::{Result};
+use chrono::Utc;
+use crate::models::LogResponse;
 
-use crate::{
-    models::{Hero, Log, Team, MyResult, PostParam},
-};
-
-#[derive(Debug, Display, Error, From)]
-pub enum PersistenceError {
-    ServerError,
-    MysqlError(mysql::Error),
-    Unknown,
-}
-
-impl actix_web::ResponseError for PersistenceError {
-    fn status_code(&self) -> StatusCode {
-        match self {
-            PersistenceError::ServerError => StatusCode::SERVICE_UNAVAILABLE,
-            PersistenceError::MysqlError(_) | PersistenceError::Unknown => {
-                StatusCode::INTERNAL_SERVER_ERROR
-            }
-        }
+pub async fn pick(pool: &sqlx::MySqlPool, param: PostParam) -> Result<MyResult, actix_web::Error> {
+    if let Ok(team) = get_team_by_encrypt_code(param.encrypt_code, pool).await {
+        let log_responses = get_log_by_team_id(team.id, pool).await.unwrap();
+        Ok(MyResult {
+            team_id: team.id,
+            data: team.pick_content,
+            time: Utc::now().naive_utc(),
+            logs: log_responses,
+        })
+    } else {
+        Err(actix_web::error::ErrorNotFound("No team found with the given encrypt code"))
     }
 }
 
-pub fn pick(param: PostParam, pool: &mysql::Pool) -> actix_web::Result<MyResult, PersistenceError> {
-    let mut conn = pool.get_conn()?;
-    Ok(MyResult {
-        team_id: Option::from(1),
-        data: param.encrypt_code.unwrap_or("123".to_string()),
-        time: Utc::now(),
-        logs: None,
-    })
+
+async fn get_team_by_encrypt_code(encrypt_code: String, pool: &sqlx::MySqlPool) -> Result<Team, sqlx::Error> {
+    sqlx::query_as::<_, Team>("SELECT * FROM team WHERE encrypt_code = ?")
+        .bind(encrypt_code)
+        .fetch_one(pool)
+        .await
 }
 
-fn find_by_encrypt_code() {}
+async fn get_log_by_team_id(team_id: i32, pool: &sqlx::MySqlPool) -> Result<Vec<LogResponse>, sqlx::Error> {
+    sqlx::query_as::<_, LogResponse>("SELECT * FROM log l WHERE l.team_id = ? ORDER BY l.time DESC")
+        .bind(team_id.to_string())
+        .fetch_all(pool)
+        .await
+}

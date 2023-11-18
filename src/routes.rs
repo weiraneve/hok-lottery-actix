@@ -1,15 +1,14 @@
-use actix_web::{web, post, HttpResponse, Responder};
-
+use actix_web::{web, post, Responder};
 use crate::{
-    models::{Hero, Log, Team, MyResult, PostParam},
+    models::{PostParam},
     persistence::{pick},
 };
 
 #[post("/")]
 pub async fn pick_heroes(
     web::Json(param): web::Json<PostParam>,
-    data: web::Data<mysql::Pool>,
+    data: web::Data<sqlx::MySqlPool>,
 ) -> actix_web::Result<impl Responder> {
-    let response_data = web::block(move || pick(param, &data)).await??;
+    let response_data = pick(&data, param).await?;
     Ok(web::Json(response_data))
 }
