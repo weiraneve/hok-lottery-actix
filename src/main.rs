@@ -1,5 +1,7 @@
+use actix_cors::Cors;
 use std::{io, env};
-use actix_web::{web, App, HttpServer};
+use actix_web::{web, App, HttpServer, http};
+use actix_web::http::Method;
 
 mod persistence;
 mod models;
@@ -27,8 +29,16 @@ async fn main() -> io::Result<()> {
     log::info!("starting HTTP server at {server_addr}");
 
     HttpServer::new(move || {
+        let cors = Cors::default()
+            .allowed_origin_fn(|origin, _req_head| true)
+            .allowed_methods(vec![Method::GET, Method::POST])
+            .allowed_headers(vec![http::header::AUTHORIZATION, http::header::ACCEPT])
+            .allowed_header(http::header::CONTENT_TYPE)
+            .max_age(3600);
+
         App::new()
             .app_data(shared_data.clone())
+            .wrap(cors)
             .service(routes::pick_heroes)
     })
         .bind(server_addr)?
