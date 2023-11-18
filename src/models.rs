@@ -2,6 +2,11 @@ use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Deserialize)]
+pub struct PostParam {
+    pub encrypt_code: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
 pub struct Hero {
     pub id: Option<i32>,
     pub name: String,
@@ -38,9 +43,4 @@ pub struct MyResult {
     pub data: String,
     pub time: DateTime<Utc>,
     pub logs: Option<Vec<LogResponse>>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct PostParam {
-    pub encrypt_code: Option<String>,
 }
