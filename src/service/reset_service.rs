@@ -35,7 +35,7 @@ pub async fn reset_one_team(id: i32, pool: &Data<MySqlPool>) -> Result<MyResult,
 }
 
 pub async fn reset_all_teams(pool: &MySqlPool) -> Result<MyResult, actix_web::Error> {
-    db_reset_all_teams(pool).await.expect("rest all teams failed");
+    db_reset_all_teams(pool).await.map_err(actix_web::error::ErrorInternalServerError)?;
     let result = MyResult {
         team_id: 0,
         data: "重置所有队伍成功".to_string(),
@@ -46,7 +46,7 @@ pub async fn reset_all_teams(pool: &MySqlPool) -> Result<MyResult, actix_web::Er
 }
 
 pub async fn reset_all_heroes(pool: &MySqlPool) -> Result<MyResult, actix_web::Error> {
-    db_reset_all_heroes(pool).await.expect("rest all heroes failed");
+    db_reset_all_heroes(pool).await.map_err(actix_web::error::ErrorInternalServerError)?;
     let result = MyResult {
         team_id: 0,
         data: "重置所有英雄成功".to_string(),
