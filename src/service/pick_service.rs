@@ -2,12 +2,13 @@ use actix_web::Result;
 use chrono::{FixedOffset, Utc};
 use sqlx::{MySqlPool};
 use crate::dao::pick_dao::{get_heroes_not_is_pick, get_log_by_team_id, get_team_by_encrypt_code, save_hero, save_log, save_team};
-
-use crate::model::hero::Hero;
-use crate::model::log_response::LogResponse;
-use crate::model::my_result::MyResult;
-use crate::model::post_param::PostParam;
-use crate::model::team::Team;
+use crate::model::{
+    hero::Hero,
+    log_response::LogResponse,
+    my_result::MyResult,
+    post_param::PostParam,
+    team::Team,
+};
 
 pub async fn pick(pool: &MySqlPool, param: PostParam) -> Result<MyResult, actix_web::Error> {
     if let Ok(mut team) = get_team_by_encrypt_code(param.encrypt_code, pool).await {

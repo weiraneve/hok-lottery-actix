@@ -2,10 +2,11 @@ use actix_web::Result;
 use actix_web::web::Data;
 use chrono::{FixedOffset, Utc};
 use sqlx::MySqlPool;
-use crate::dao::reset_dao;
-
 use crate::dao::reset_dao::{find_team_by_id, reset_team};
 use crate::model::my_result::MyResult;
+
+use crate::dao::reset_dao::reset_all_teams as db_reset_all_teams;
+use crate::dao::reset_dao::reset_all_heroes as db_reset_all_heroes;
 
 pub async fn reset_one_team(id: i32, pool: &Data<MySqlPool>) -> Result<MyResult, actix_web::Error> {
     let mut result = MyResult {
@@ -34,7 +35,7 @@ pub async fn reset_one_team(id: i32, pool: &Data<MySqlPool>) -> Result<MyResult,
 }
 
 pub async fn reset_all_teams(pool: &MySqlPool) -> Result<MyResult, actix_web::Error> {
-    reset_dao::reset_all_teams(pool).await.expect("rest all teams failed");
+    db_reset_all_teams(pool).await.expect("rest all teams failed");
     let result = MyResult {
         team_id: 0,
         data: "重置所有队伍成功".to_string(),
@@ -45,7 +46,7 @@ pub async fn reset_all_teams(pool: &MySqlPool) -> Result<MyResult, actix_web::Er
 }
 
 pub async fn reset_all_heroes(pool: &MySqlPool) -> Result<MyResult, actix_web::Error> {
-    reset_dao::reset_all_heroes(pool).await.expect("rest all heroes failed");
+    db_reset_all_heroes(pool).await.expect("rest all heroes failed");
     let result = MyResult {
         team_id: 0,
         data: "重置所有英雄成功".to_string(),
