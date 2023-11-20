@@ -27,7 +27,7 @@ pub async fn reset_all_heroes(pool: &MySqlPool) -> Result<(), sqlx::Error> {
 }
 
 pub async fn find_team_by_id(id: i32, pool: &MySqlPool) -> Result<(), sqlx::Error> {
-    sqlx::query_as::<_, Hero>("SELECT * FROM `hero` h WHERE h.id = (?)")
+    sqlx::query_as::<_, Hero>("SELECT * FROM `team` h WHERE h.id = (?)")
         .bind(id)
         .fetch_one(pool)
         .await?;
