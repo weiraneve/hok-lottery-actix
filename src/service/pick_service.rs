@@ -11,18 +11,19 @@ use crate::model::{
 };
 
 pub async fn pick(pool: &MySqlPool, param: PostParam) -> Result<MyResult, actix_web::Error> {
-    if let Ok(mut team) = get_team_by_encrypt_code(param.encrypt_code, pool).await {
-        let team = &mut team;
-        let mut result = MyResult {
-            team_id: team.id,
-            data: team.clone().pick_content,
-            time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
-            logs: get_log_by_team_id(team.id, pool).await.unwrap(),
-        };
-        check_team_is_picked(team, &mut result, pool).await;
-        Ok(result)
-    } else {
-        Err(actix_web::error::ErrorNotFound("No team found with the given encrypt code"))
+    match get_team_by_encrypt_code(param.encrypt_code, pool).await {
+        Ok(mut team) => {
+            let team = &mut team;
+            let mut result = MyResult {
+                team_id: team.id,
+                data: team.clone().pick_content,
+                time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
+                logs: get_log_by_team_id(team.id, pool).await.unwrap(),
+            };
+            check_team_is_picked(team, &mut result, pool).await;
+            Ok(result)
+        }
+        Err(e) => Err(actix_web::error::ErrorInternalServerError(e))
     }
 }
 
