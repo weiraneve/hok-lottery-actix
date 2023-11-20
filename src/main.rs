@@ -1,7 +1,11 @@
+use std::{env, io};
+use std::sync::Arc;
+
 use actix_cors::Cors;
-use std::{io, env};
-use actix_web::{web, App, HttpServer, http};
-use hok_lottery_actix::controller::{pick_controller, reset_controller};
+use actix_web::{App, http, HttpServer, web};
+
+use hok_lottery_actix::{AppState, controller};
+use hok_lottery_actix::dao::Database;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -9,8 +13,10 @@ async fn main() -> io::Result<()> {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("DEBUG"));
     let server_addr = env::var("SERVER_ADDR").expect("SERVER_ADDR is not set in .env file");
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let pool = sqlx::MySqlPool::connect(&database_url).await.expect("Failed to create pool");
     log::info!("starting HTTP server at {server_addr}");
+
+    let db_context = Database::new(&database_url).await;
+    let app_state = web::Data::new(AppState { context: Arc::new(db_context) });
 
     HttpServer::new(move || {
         let cors = Cors::default()
@@ -21,12 +27,10 @@ async fn main() -> io::Result<()> {
             .max_age(3600);
 
         App::new()
-            .app_data(web::Data::new(pool.clone()))
+            .app_data(app_state.clone())
             .wrap(cors)
-            .service(pick_controller::pick_heroes)
-            .service(reset_controller::reset_team)
-            .service(reset_controller::reset_all_teams)
-            .service(reset_controller::reset_all_heroes)
+            .configure(controller::init_pick_controller)
+            .configure(controller::init_reset_controller)
     })
         .bind(server_addr)?
         .run()

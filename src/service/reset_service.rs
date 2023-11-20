@@ -1,23 +1,20 @@
 use actix_web::Result;
 use actix_web::web::Data;
 use chrono::{FixedOffset, Utc};
-use sqlx::MySqlPool;
-use crate::dao::reset_dao::{find_team_by_id, reset_team};
+
+use crate::AppState;
 use crate::model::my_result::MyResult;
 
-use crate::dao::reset_dao::reset_all_teams as db_reset_all_teams;
-use crate::dao::reset_dao::reset_all_heroes as db_reset_all_heroes;
-
-pub async fn reset_one_team(id: i32, pool: &Data<MySqlPool>) -> Result<MyResult, actix_web::Error> {
+pub async fn reset_one_team(id: i32, app_state: &Data<AppState<'_>>) -> Result<MyResult, actix_web::Error> {
     let mut result = MyResult {
         team_id: 0,
         data: "".to_string(),
         time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
         logs: vec![],
     };
-    match find_team_by_id(id, pool).await {
+    match app_state.context.teams.find_team_by_id(id).await {
         Ok(()) => {
-            reset_team(id, pool).await.expect("reset team failed");
+            app_state.context.teams.reset_team(id).await.expect("reset team failed");
             result.data = format!("刷新队伍{}成功", id);
         }
         Err(e) => {
@@ -34,8 +31,8 @@ pub async fn reset_one_team(id: i32, pool: &Data<MySqlPool>) -> Result<MyResult,
     Ok(result)
 }
 
-pub async fn reset_all_teams(pool: &MySqlPool) -> Result<MyResult, actix_web::Error> {
-    db_reset_all_teams(pool).await.map_err(actix_web::error::ErrorInternalServerError)?;
+pub async fn reset_all_teams(app_state: &Data<AppState<'_>>) -> Result<MyResult, actix_web::Error> {
+    app_state.context.teams.reset_all_teams().await.map_err(actix_web::error::ErrorInternalServerError)?;
     let result = MyResult {
         team_id: 0,
         data: "重置所有队伍成功".to_string(),
@@ -45,8 +42,8 @@ pub async fn reset_all_teams(pool: &MySqlPool) -> Result<MyResult, actix_web::Er
     Ok(result)
 }
 
-pub async fn reset_all_heroes(pool: &MySqlPool) -> Result<MyResult, actix_web::Error> {
-    db_reset_all_heroes(pool).await.map_err(actix_web::error::ErrorInternalServerError)?;
+pub async fn reset_all_heroes(app_state: &Data<AppState<'_>>) -> Result<MyResult, actix_web::Error> {
+    app_state.context.heroes.reset_all_heroes().await.map_err(actix_web::error::ErrorInternalServerError)?;
     let result = MyResult {
         team_id: 0,
         data: "重置所有英雄成功".to_string(),
