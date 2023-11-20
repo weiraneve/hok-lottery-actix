@@ -29,9 +29,9 @@ async fn main() -> io::Result<()> {
             .app_data(web::Data::new(pool.clone()))
             .wrap(cors)
             .service(pick_controller::pick_heroes)
-            .service(reset_controller::clean_team)
-            .service(reset_controller::clean_all_teams)
-            .service(reset_controller::clean_all_heroes)
+            .service(reset_controller::reset_team)
+            .service(reset_controller::reset_all_teams)
+            .service(reset_controller::reset_all_heroes)
     })
         .bind(server_addr)?
         .run()
