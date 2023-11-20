@@ -1,12 +1,7 @@
 use actix_cors::Cors;
 use std::{io, env};
 use actix_web::{web, App, HttpServer, http};
-use crate::controller::{pick_controller, reset_controller};
-
-mod controller;
-mod dao;
-mod service;
-mod model;
+use hok_lottery_actix::controller::{pick_controller, reset_controller};
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
