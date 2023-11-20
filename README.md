@@ -7,3 +7,7 @@ I hava kotlin SpringBoot project as some logic [hok-lottery](https://github.com/
 ## apis
 
 See [the API documentation pages](./apis) for more info.
+
+## sql
+
+See [lottery sql info](./sql) for more sql info
