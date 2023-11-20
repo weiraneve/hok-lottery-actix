@@ -1,10 +1,12 @@
 use actix_cors::Cors;
 use std::{io, env};
 use actix_web::{web, App, HttpServer, http};
+use crate::controller::{pick_controller, reset_controller};
 
-mod persistence;
-mod models;
-mod routes;
+mod controller;
+mod dao;
+mod service;
+mod model;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
@@ -26,10 +28,10 @@ async fn main() -> io::Result<()> {
         App::new()
             .app_data(web::Data::new(pool.clone()))
             .wrap(cors)
-            .service(routes::pick_heroes)
-            .service(routes::clean_team)
-            .service(routes::clean_all_teams)
-            .service(routes::clean_all_heroes)
+            .service(pick_controller::pick_heroes)
+            .service(reset_controller::clean_team)
+            .service(reset_controller::clean_all_teams)
+            .service(reset_controller::clean_all_heroes)
     })
         .bind(server_addr)?
         .run()
