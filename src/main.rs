@@ -15,8 +15,8 @@ async fn main() -> io::Result<()> {
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     log::info!("starting HTTP server at {server_addr}");
 
-    let db_context = Database::new(&database_url).await;
-    let app_state = web::Data::new(AppState { context: Arc::new(db_context) });
+    let database = Database::new(&database_url).await;
+    let app_state = web::Data::new(AppState { database: Arc::new(database) });
 
     HttpServer::new(move || {
         let cors = Cors::default()

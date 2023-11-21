@@ -7,5 +7,5 @@ pub mod service;
 pub mod model;
 
 pub struct AppState<'a> {
-    pub context: Arc<Database<'a>>
+    pub database: Arc<Database<'a>>
 }
