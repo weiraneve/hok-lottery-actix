@@ -6,13 +6,13 @@ use crate::model::hero::Hero;
 use crate::model::log_response::Log;
 use crate::model::team::Team;
 
-pub struct Table<'c, T> where T: FromRow<'c, MySqlRow>, {
+pub struct Table<T> where T: FromRow<'static, MySqlRow>, {
     pub pool: Arc<MySqlPool>,
-    _from_row: fn(&'c MySqlRow) -> Result<T, sqlx::Error>,
-    _marker: PhantomData<&'c T>,
+    _from_row: fn(&'static MySqlRow) -> Result<T, sqlx::Error>,
+    _marker: PhantomData<T>,
 }
 
-impl<'c, T> Table<'c, T> where T: FromRow<'c, MySqlRow>, {
+impl<T> Table<T> where T: FromRow<'static, MySqlRow>, {
     fn new(pool: Arc<MySqlPool>) -> Self {
         Table {
             pool,
@@ -22,14 +22,14 @@ impl<'c, T> Table<'c, T> where T: FromRow<'c, MySqlRow>, {
     }
 }
 
-pub struct Database<'c> {
-    pub heroes: Arc<Table<'c, Hero>>,
-    pub teams: Arc<Table<'c, Team>>,
-    pub logs: Arc<Table<'c, Log>>,
+pub struct Database {
+    pub heroes: Arc<Table<Hero>>,
+    pub teams: Arc<Table<Team>>,
+    pub logs: Arc<Table<Log>>,
 }
 
-impl<'c> Database<'c> {
-    pub async fn new(sql_url: &String) -> Database<'c> {
+impl Database {
+    pub async fn new(sql_url: &String) -> Self {
         let connection = MySqlPool::connect(&sql_url).await.unwrap();
         let pool = Arc::new(connection);
 

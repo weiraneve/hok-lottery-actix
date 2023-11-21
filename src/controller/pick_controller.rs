@@ -10,7 +10,7 @@ pub fn init(cfg: &mut web::ServiceConfig) {
 #[post("/")]
 async fn pick_heroes(
     web::Json(param): web::Json<PostParam>,
-    app_state: web::Data<AppState<'_>>,
+    app_state: web::Data<AppState>,
 ) -> actix_web::Result<impl Responder> {
     let response_data = pick(param, &app_state).await?;
     Ok(web::Json(response_data))

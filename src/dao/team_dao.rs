@@ -2,7 +2,7 @@ use crate::dao::Table;
 use crate::model::log_response::Log;
 use crate::model::team::Team;
 
-impl<'c> Table<'c, Team> {
+impl Table<Team> {
     pub async fn get_team_by_encrypt_code(&self, encrypt_code: String) -> Result<Team, sqlx::Error> {
         sqlx::query_as::<_, Team>("SELECT * FROM `team` WHERE `encrypt_code` = ?")
             .bind(encrypt_code)

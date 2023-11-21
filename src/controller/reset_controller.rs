@@ -13,20 +13,20 @@ pub fn init(cfg: &mut web::ServiceConfig) {
 #[get("/reset/team")]
 pub async fn reset_team(
     query: web::Query<TeamQuery>,
-    app_state: web::Data<AppState<'_>>,
+    app_state: web::Data<AppState>,
 ) -> actix_web::Result<impl Responder> {
     let response_data = reset_service::reset_one_team(query.id, &app_state).await?;
     Ok(web::Json(response_data))
 }
 
 #[get("/reset/teams")]
-pub async fn reset_all_teams(app_state: web::Data<AppState<'_>>) -> actix_web::Result<impl Responder> {
+pub async fn reset_all_teams(app_state: web::Data<AppState>) -> actix_web::Result<impl Responder> {
     let response_data = reset_service::reset_all_teams(&app_state).await?;
     Ok(web::Json(response_data))
 }
 
 #[get("/reset/heroes")]
-pub async fn reset_all_heroes(app_state: web::Data<AppState<'_>>) -> actix_web::Result<impl Responder> {
+pub async fn reset_all_heroes(app_state: web::Data<AppState>) -> actix_web::Result<impl Responder> {
     let response_data = reset_service::reset_all_heroes(&app_state).await?;
     Ok(web::Json(response_data))
 }

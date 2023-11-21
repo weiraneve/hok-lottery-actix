@@ -3,5 +3,5 @@ mod team_dao;
 mod hero_dao;
 mod log_dao;
 
-pub type Database<'c> = database::Database<'c>;
-pub type Table<'c, T> = database::Table<'c, T>;
+pub type Database = database::Database;
+pub type Table<T> = database::Table<T>;

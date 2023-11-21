@@ -1,7 +1,7 @@
 use crate::dao::Table;
 use crate::model::hero::Hero;
 
-impl<'c> Table<'c, Hero> {
+impl Table<Hero> {
     pub async fn get_heroes_not_is_pick(&self) -> Result<Hero, sqlx::Error> {
         sqlx::query_as::<_, Hero>("SELECT * FROM `hero` h WHERE h.is_pick = FALSE ORDER BY RAND() LIMIT 1")
             .fetch_one(&*self.pool)

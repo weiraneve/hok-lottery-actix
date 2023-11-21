@@ -5,7 +5,8 @@ pub mod controller;
 pub mod dao;
 pub mod service;
 pub mod model;
+pub mod creat_app;
 
-pub struct AppState<'a> {
-    pub database: Arc<Database<'a>>
+pub struct AppState {
+    pub database: Arc<Database>
 }

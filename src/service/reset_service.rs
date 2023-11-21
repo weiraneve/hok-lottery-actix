@@ -5,7 +5,7 @@ use chrono::{FixedOffset, Utc};
 use crate::AppState;
 use crate::model::my_result::MyResult;
 
-pub async fn reset_one_team(id: i32, app_state: &Data<AppState<'_>>) -> Result<MyResult, actix_web::Error> {
+pub async fn reset_one_team(id: i32, app_state: &Data<AppState>) -> Result<MyResult, actix_web::Error> {
     let mut result = MyResult {
         team_id: 0,
         data: "".to_string(),
@@ -31,7 +31,7 @@ pub async fn reset_one_team(id: i32, app_state: &Data<AppState<'_>>) -> Result<M
     Ok(result)
 }
 
-pub async fn reset_all_teams(app_state: &Data<AppState<'_>>) -> Result<MyResult, actix_web::Error> {
+pub async fn reset_all_teams(app_state: &Data<AppState>) -> Result<MyResult, actix_web::Error> {
     app_state.database.teams.reset_all_teams().await.map_err(actix_web::error::ErrorInternalServerError)?;
     let result = MyResult {
         team_id: 0,
@@ -42,7 +42,7 @@ pub async fn reset_all_teams(app_state: &Data<AppState<'_>>) -> Result<MyResult,
     Ok(result)
 }
 
-pub async fn reset_all_heroes(app_state: &Data<AppState<'_>>) -> Result<MyResult, actix_web::Error> {
+pub async fn reset_all_heroes(app_state: &Data<AppState>) -> Result<MyResult, actix_web::Error> {
     app_state.database.heroes.reset_all_heroes().await.map_err(actix_web::error::ErrorInternalServerError)?;
     let result = MyResult {
         team_id: 0,
