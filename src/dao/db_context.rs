@@ -3,7 +3,7 @@ use std::sync::Arc;
 use sqlx::{FromRow, MySqlPool};
 use sqlx::mysql::MySqlRow;
 use crate::model::hero::Hero;
-use crate::model::log_response::LogResponse;
+use crate::model::log_response::Log;
 use crate::model::team::Team;
 
 pub struct Table<'c, T> where T: FromRow<'c, MySqlRow>, {
@@ -25,7 +25,7 @@ impl<'c, T> Table<'c, T> where T: FromRow<'c, MySqlRow>, {
 pub struct Database<'c> {
     pub heroes: Arc<Table<'c, Hero>>,
     pub teams: Arc<Table<'c, Team>>,
-    pub logs: Arc<Table<'c, LogResponse>>,
+    pub logs: Arc<Table<'c, Log>>,
 }
 
 impl<'c> Database<'c> {

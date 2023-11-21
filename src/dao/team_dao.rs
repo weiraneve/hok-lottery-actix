@@ -1,5 +1,5 @@
 use crate::dao::Table;
-use crate::model::log_response::LogResponse;
+use crate::model::log_response::Log;
 use crate::model::team::Team;
 
 impl<'c> Table<'c, Team> {
@@ -10,8 +10,8 @@ impl<'c> Table<'c, Team> {
             .await
     }
 
-    pub async fn get_log_by_team_id(&self, team_id: i32) -> Result<Vec<LogResponse>, sqlx::Error> {
-        sqlx::query_as::<_, LogResponse>("SELECT * FROM `log` l WHERE l.team_id = ? ORDER BY l.time DESC")
+    pub async fn get_log_by_team_id(&self, team_id: i32) -> Result<Vec<Log>, sqlx::Error> {
+        sqlx::query_as::<_, Log>("SELECT * FROM `log` l WHERE l.team_id = ? ORDER BY l.time DESC")
             .bind(team_id.to_string())
             .fetch_all(&*self.pool)
             .await

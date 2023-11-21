@@ -4,7 +4,7 @@ use chrono::{FixedOffset, Utc};
 use crate::AppState;
 use crate::model::{
     hero::Hero,
-    log_response::LogResponse,
+    log_response::Log,
     my_result::MyResult,
     post_param::PostParam,
     team::Team,
@@ -44,7 +44,7 @@ async fn update_team_is_picked(team: &mut Team, pick_result: &String, app_state:
 }
 
 async fn save_result_for_log(team_index: i32, pick_result: &String, app_state: &Data<AppState<'_>>) {
-    let log = LogResponse {
+    let log = Log {
         team_id: team_index,
         pick_group: pick_result.clone(),
         time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
