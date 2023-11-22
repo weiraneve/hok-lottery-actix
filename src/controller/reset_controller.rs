@@ -1,8 +1,7 @@
 use actix_web::{get, Responder, web};
-use crate::app_state::AppState;
 
+use crate::app_state::AppState;
 use crate::model::team_query::TeamQuery;
-use crate::service::reset_service;
 
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(reset_team);
@@ -15,18 +14,18 @@ pub async fn reset_team(
     query: web::Query<TeamQuery>,
     app_state: web::Data<AppState>,
 ) -> actix_web::Result<impl Responder> {
-    let response_data = reset_service::reset_one_team(query.id, &app_state).await?;
+    let response_data = app_state.service.reset.reset_one_team(query.id).await?;
     Ok(web::Json(response_data))
 }
 
 #[get("/reset/teams")]
 pub async fn reset_all_teams(app_state: web::Data<AppState>) -> actix_web::Result<impl Responder> {
-    let response_data = reset_service::reset_all_teams(&app_state).await?;
+    let response_data = app_state.service.reset.reset_all_teams().await?;
     Ok(web::Json(response_data))
 }
 
 #[get("/reset/heroes")]
 pub async fn reset_all_heroes(app_state: web::Data<AppState>) -> actix_web::Result<impl Responder> {
-    let response_data = reset_service::reset_all_heroes(&app_state).await?;
+    let response_data = app_state.service.reset.reset_all_heroes().await?;
     Ok(web::Json(response_data))
 }

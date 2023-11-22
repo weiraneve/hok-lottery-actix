@@ -5,21 +5,17 @@ use actix_web::HttpServer;
 use sqlx::MySqlPool;
 
 use hok_lottery_actix::creat_app::create_app;
-use hok_lottery_actix::dao::Database;
 
 #[actix_web::main]
 async fn main() -> io::Result<()> {
     init_environment();
     let server_addr = env::var("SERVER_ADDR").expect("SERVER_ADDR is not set in .env file");
-    let database = init_database().await;
-
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    let connection = MySqlPool::connect(&database_url).await.unwrap();
-    let pool = Arc::new(connection);
+    let pool = init_database(database_url).await;
 
     log::info!("starting HTTP server at {server_addr}");
 
-    HttpServer::new(move || { create_app(database.clone(), pool.clone()) })
+    HttpServer::new(move || { create_app(pool.clone()) })
         .bind(server_addr)?
         .run()
         .await
@@ -30,7 +26,7 @@ fn init_environment() {
     env_logger::init_from_env(env_logger::Env::new().default_filter_or("DEBUG"));
 }
 
-async fn init_database() -> Arc<Database> {
-    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
-    Arc::new(Database::new(&database_url).await)
+async fn init_database(database_url: String) -> Arc<MySqlPool> {
+    let connection = MySqlPool::connect(&database_url).await.unwrap();
+    Arc::new(connection)
 }
