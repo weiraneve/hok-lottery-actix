@@ -1,7 +1,7 @@
-use actix_web::{web, post, Responder};
+use actix_web::{post, Responder, web};
+
 use crate::app_state::AppState;
 use crate::model::post_param::PostParam;
-use crate::service::pick_service::pick;
 
 pub fn init(cfg: &mut web::ServiceConfig) {
     cfg.service(pick_heroes);
@@ -12,6 +12,6 @@ async fn pick_heroes(
     web::Json(param): web::Json<PostParam>,
     app_state: web::Data<AppState>,
 ) -> actix_web::Result<impl Responder> {
-    let response_data = pick(param, &app_state).await?;
+    let response_data = app_state.pick_service.pick(param).await?;
     Ok(web::Json(response_data))
 }
