@@ -2,6 +2,7 @@ use std::{env, io};
 use std::sync::Arc;
 
 use actix_web::HttpServer;
+use sqlx::MySqlPool;
 
 use hok_lottery_actix::creat_app::create_app;
 use hok_lottery_actix::dao::Database;
@@ -12,9 +13,13 @@ async fn main() -> io::Result<()> {
     let server_addr = env::var("SERVER_ADDR").expect("SERVER_ADDR is not set in .env file");
     let database = init_database().await;
 
+    let database_url = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
+    let connection = MySqlPool::connect(&database_url).await.unwrap();
+    let pool = Arc::new(connection);
+
     log::info!("starting HTTP server at {server_addr}");
 
-    HttpServer::new(move || { create_app(database.clone()) })
+    HttpServer::new(move || { create_app(database.clone(), pool.clone()) })
         .bind(server_addr)?
         .run()
         .await
