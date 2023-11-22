@@ -1,6 +1,6 @@
 use actix_web::{get, Responder, web};
+use crate::app_state::AppState;
 
-use crate::AppState;
 use crate::model::team_query::TeamQuery;
 use crate::service::reset_service;
 

@@ -1,8 +1,8 @@
 use actix_web::Result;
 use actix_web::web::Data;
 use chrono::{FixedOffset, Utc};
+use crate::app_state::AppState;
 
-use crate::AppState;
 use crate::model::my_result::MyResult;
 
 pub async fn reset_one_team(id: i32, app_state: &Data<AppState>) -> Result<MyResult, actix_web::Error> {

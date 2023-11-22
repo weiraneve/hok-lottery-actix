@@ -5,7 +5,8 @@ use actix_web::{App, Error, http, web};
 use actix_web::body::MessageBody;
 use actix_web::dev::{ServiceFactory, ServiceRequest, ServiceResponse};
 
-use crate::{AppState, controller};
+use crate::{controller};
+use crate::app_state::AppState;
 use crate::dao::Database;
 
 pub fn create_app(database: Arc<Database>) -> App<
