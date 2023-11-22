@@ -14,15 +14,48 @@ See [lottery sql info](./sql) for more sql info
 
 ## usages
 
-1.  Create database and tables, you can see it by [lottery sql](./sql).
-    this can be done in the terminal:
-      ```shell
-      mysql -u root -p lottery < ./sql/lottery.sql
-      ```
+1. Create database and tables, you can see it by [lottery sql](./sql).
+   this can be done in the terminal:
+     ```shell
+     mysql -u root -p lottery < ./sql/lottery.sql
+     ```
 2. Create a `.env` file in this directory:
     ```ini
     SERVER_ADDR=127.0.0.1:8034
     DATABASE_URL=mysql://<username>:<password>@localhost:3306/lottery
     ```
 
-3. Run the server 
+3. Run the server
+
+## architecture overview
+
+my actix `The Onion Architecture`:
+
+```
+src
+├── controller
+│     ├── mod.rs
+│     ├── pick_controller.rs
+│     └── reset_controller.rs
+├── model
+│     ├── hero.rs
+│     ├── log_response.rs
+│     ├── mod.rs
+│     ├── my_result.rs
+│     ├── post_param.rs
+│     ├── team.rs
+│     └── team_query.rs
+├── repository
+│     ├── hero.rs
+│     ├── log.rs
+│     ├── mod.rs
+│     └── team.rs
+├── service
+│     ├── mod.rs
+│     ├── pick.rs
+│     └── reset.rs
+├── app_state.rs
+├── creat_app.rs
+├── lib.rs
+├── main.rs
+```
