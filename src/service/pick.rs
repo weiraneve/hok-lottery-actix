@@ -34,14 +34,14 @@ impl PickServiceImpl {
 #[async_trait]
 impl PickService for PickServiceImpl {
     async fn pick(&self, param: PostParam) -> Result<MyResult, actix_web::Error> {
-        match self.team_repository.get_team_by_encrypt_code(param.encrypt_code).await {
+        match self.team_repository.get_by_encrypt_code(param.encrypt_code).await {
             Ok(mut team) => {
                 let team = &mut team;
                 let mut result = MyResult {
                     team_id: team.id,
                     data: team.clone().pick_content,
                     time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
-                    logs: self.team_repository.get_log_by_team_id(team.id).await.unwrap(),
+                    logs: self.log_repository.get_by_team_id(team.id).await.unwrap(),
                 };
                 self.check_team_is_picked(team, &mut result).await;
                 Ok(result)
@@ -65,7 +65,7 @@ impl PickServiceImpl {
         team.is_picked = true;
         team.pick_content = pick_result.clone();
         team.update_time = Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local();
-        self.team_repository.save_team(team.clone()).await.expect("save team failed");
+        self.team_repository.save(team.clone()).await.expect("save team failed");
     }
 
     async fn save_result_for_log(&self, team_index: i32, pick_result: &String) {
@@ -74,7 +74,7 @@ impl PickServiceImpl {
             pick_group: pick_result.clone(),
             time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
         };
-        self.log_repository.save_log(log).await.expect("save log failed");
+        self.log_repository.save(log).await.expect("save log failed");
     }
 
     async fn pick_hero(&self) -> String {

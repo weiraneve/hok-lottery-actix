@@ -1,23 +1,19 @@
 use std::sync::Arc;
-use async_trait::async_trait;
 
+use async_trait::async_trait;
 use sqlx::MySqlPool;
 
-use crate::model::log_response::Log;
 use crate::model::team::Team;
 
 #[async_trait]
 pub trait TeamRepository: Send + Sync {
-    async fn get_team_by_encrypt_code(&self, encrypt_code: String) -> Result<Team, sqlx::Error>;
+    async fn get_by_encrypt_code(&self, encrypt_code: String) -> Result<Team, sqlx::Error>;
+    async fn save(&self, team: Team) -> Result<(), sqlx::Error>;
+    async fn reset_one(&self, id: i32) -> Result<(), sqlx::Error>;
 
-    async fn get_log_by_team_id(&self, team_id: i32) -> Result<Vec<Log>, sqlx::Error>;
+    async fn reset_all(&self) -> Result<(), sqlx::Error>;
 
-    async fn save_team(&self, team: Team) -> Result<(), sqlx::Error>;
-    async fn reset_team(&self, id: i32) -> Result<(), sqlx::Error>;
-
-    async fn reset_all_teams(&self) -> Result<(), sqlx::Error>;
-
-    async fn find_team_by_id(&self, id: i32) -> Result<(), sqlx::Error>;
+    async fn get_by_id(&self, id: i32) -> Result<(), sqlx::Error>;
 }
 
 pub struct TeamRepositoryImpl {
@@ -32,21 +28,14 @@ impl TeamRepositoryImpl {
 
 #[async_trait]
 impl TeamRepository for TeamRepositoryImpl {
-    async fn get_team_by_encrypt_code(&self, encrypt_code: String) -> Result<Team, sqlx::Error> {
+    async fn get_by_encrypt_code(&self, encrypt_code: String) -> Result<Team, sqlx::Error> {
         sqlx::query_as::<_, Team>("SELECT * FROM `team` WHERE `encrypt_code` = ?")
             .bind(encrypt_code)
             .fetch_one(&*self.pool)
             .await
     }
 
-    async fn get_log_by_team_id(&self, team_id: i32) -> Result<Vec<Log>, sqlx::Error> {
-        sqlx::query_as::<_, Log>("SELECT * FROM `log` l WHERE l.team_id = ? ORDER BY l.time DESC")
-            .bind(team_id.to_string())
-            .fetch_all(&*self.pool)
-            .await
-    }
-
-    async fn save_team(&self, team: Team) -> Result<(), sqlx::Error> {
+    async fn save(&self, team: Team) -> Result<(), sqlx::Error> {
         sqlx::query(r#"
         INSERT INTO `team` (`id`, `encrypt_code`, `pick_content`, `is_picked`, `update_time`)
         VALUES (?, ?, ?, ?, ?)
@@ -67,7 +56,7 @@ impl TeamRepository for TeamRepositoryImpl {
         Ok(())
     }
 
-    async fn reset_team(&self, id: i32) -> Result<(), sqlx::Error> {
+    async fn reset_one(&self, id: i32) -> Result<(), sqlx::Error> {
         sqlx::query("UPDATE `team` SET `pick_content`='',`is_picked`=0,`update_time`=current_time WHERE `id`=(?)")
             .bind(id)
             .execute(&*self.pool)
@@ -76,7 +65,7 @@ impl TeamRepository for TeamRepositoryImpl {
         Ok(())
     }
 
-    async fn reset_all_teams(&self) -> Result<(), sqlx::Error> {
+    async fn reset_all(&self) -> Result<(), sqlx::Error> {
         sqlx::query("UPDATE `team` SET `pick_content`='',`is_picked`=0,`update_time`=current_time WHERE `is_picked`=true")
             .execute(&*self.pool)
             .await?;
@@ -84,7 +73,7 @@ impl TeamRepository for TeamRepositoryImpl {
         Ok(())
     }
 
-    async fn find_team_by_id(&self, id: i32) -> Result<(), sqlx::Error> {
+    async fn get_by_id(&self, id: i32) -> Result<(), sqlx::Error> {
         sqlx::query_as::<_, Team>("SELECT * FROM `team` h WHERE h.id = (?)")
             .bind(id)
             .fetch_one(&*self.pool)

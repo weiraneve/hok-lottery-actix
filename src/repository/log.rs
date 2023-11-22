@@ -7,7 +7,8 @@ use crate::model::log_response::Log;
 
 #[async_trait]
 pub trait LogRepository: Send + Sync {
-    async fn save_log(&self, log: Log) -> Result<(), sqlx::Error>;
+    async fn get_by_team_id(&self, team_id: i32) -> Result<Vec<Log>, sqlx::Error>;
+    async fn save(&self, log: Log) -> Result<(), sqlx::Error>;
 }
 
 pub struct LogRepositoryImpl {
@@ -22,7 +23,14 @@ impl LogRepositoryImpl {
 
 #[async_trait]
 impl LogRepository for LogRepositoryImpl {
-    async fn save_log(&self, log: Log) -> Result<(), sqlx::Error> {
+    async fn get_by_team_id(&self, team_id: i32) -> Result<Vec<Log>, sqlx::Error> {
+        sqlx::query_as::<_, Log>("SELECT * FROM `log` l WHERE l.team_id = ? ORDER BY l.time DESC")
+            .bind(team_id.to_string())
+            .fetch_all(&*self.pool)
+            .await
+    }
+
+    async fn save(&self, log: Log) -> Result<(), sqlx::Error> {
         sqlx::query("INSERT INTO `log` (`team_id`, `pick_group`, `time`) VALUES (?, ?, ?)")
             .bind(log.team_id)
             .bind(log.pick_group)
