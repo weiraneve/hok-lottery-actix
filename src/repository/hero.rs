@@ -7,7 +7,7 @@ use crate::model::hero::Hero;
 
 #[async_trait]
 pub trait HeroRepository: Send + Sync {
-    async fn get_not_is_pick(&self) -> Result<Hero, sqlx::Error>;
+    async fn get_not_is_pick(&self) -> Result<Vec<Hero>, sqlx::Error>;
     async fn save(&self, hero: Hero) -> Result<(), sqlx::Error>;
     async fn reset(&self) -> Result<(), sqlx::Error>;
 }
@@ -24,9 +24,9 @@ impl HeroRepositoryImpl {
 
 #[async_trait]
 impl HeroRepository for HeroRepositoryImpl {
-    async fn get_not_is_pick(&self) -> Result<Hero, sqlx::Error> {
-        sqlx::query_as::<_, Hero>("SELECT * FROM `hero` h WHERE h.is_pick = FALSE ORDER BY RAND() LIMIT 1")
-            .fetch_one(&*self.pool)
+    async fn get_not_is_pick(&self) -> Result<Vec<Hero>, sqlx::Error> {
+        sqlx::query_as::<_, Hero>("SELECT * FROM `hero` h WHERE h.is_pick = FALSE ORDER BY RAND() LIMIT 4")
+            .fetch_all(&*self.pool)
             .await
     }
 

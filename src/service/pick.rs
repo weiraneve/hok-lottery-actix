@@ -54,11 +54,23 @@ impl PickService for PickServiceImpl {
 impl PickServiceImpl {
     async fn check_team_is_picked(&self, team: &mut Team, result: &mut MyResult) {
         if !team.is_picked {
-            let pick_result = &format!("{}or{}", self.pick_hero().await, self.pick_hero().await);
+            let pick_heroes = self.hero_repository.get_not_is_pick().await.expect("get hero error");
+            let pick_result = &self.get_pick_result(pick_heroes).await;
             result.data = pick_result.clone();
             self.save_result_for_log(team.id, pick_result).await;
             self.update_team_is_picked(team, pick_result).await;
         }
+    }
+
+    async fn get_pick_result(&self, mut pick_heroes: Vec<Hero>) -> String {
+        for hero in &mut pick_heroes {
+            hero.is_pick = true;
+            self.hero_repository.save(hero.clone()).await.expect("save hero failed");
+        }
+        let names: Vec<String> = pick_heroes.into_iter().map(|hero| hero.name).collect();
+        let first_group = &names[0..2].join(",");
+        let second_group = &names[2..4].join(",");
+        format!("[{}]or[{}]", first_group, second_group)
     }
 
     async fn update_team_is_picked(&self, team: &mut Team, pick_result: &String) {
@@ -75,25 +87,5 @@ impl PickServiceImpl {
             time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
         };
         self.log_repository.save(log).await.expect("save log failed");
-    }
-
-    async fn pick_hero(&self) -> String {
-        self.get_second_random_hero(self.get_first_random_hero().await).await
-    }
-
-    async fn get_first_random_hero(&self) -> Hero {
-        let mut hero = self.hero_repository.get_not_is_pick().await.unwrap();
-        self.save_hero_and_is_pick(&mut hero).await.expect("save hero failed");
-        return hero;
-    }
-
-    async fn get_second_random_hero(&self, exist_hero: Hero) -> String {
-        let hero = self.hero_repository.get_not_is_pick().await.unwrap();
-        format!("[{}][{}]", exist_hero.name, hero.name)
-    }
-
-    async fn save_hero_and_is_pick(&self, hero: &mut Hero) -> Result<(), sqlx::Error> {
-        hero.is_pick = true;
-        self.hero_repository.save(hero.clone()).await
     }
 }
