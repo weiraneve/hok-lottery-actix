@@ -1,7 +1,7 @@
 use std::sync::Arc;
 
 use async_trait::async_trait;
-use chrono::{FixedOffset, Utc};
+use chrono::{FixedOffset, NaiveDateTime, Utc};
 
 use crate::model::hero::Hero;
 use crate::model::log_response::Log;
@@ -28,66 +28,78 @@ impl PickServiceImpl {
         hero_repository: Arc<dyn HeroRepository>,
         team_repository: Arc<dyn TeamRepository>,
         log_repository: Arc<dyn LogRepository>,
-    ) -> Self { PickServiceImpl { hero_repository, team_repository, log_repository } }
+    ) -> Self {
+        PickServiceImpl { hero_repository, team_repository, log_repository }
+    }
 }
 
 #[async_trait]
 impl PickService for PickServiceImpl {
     async fn pick(&self, param: PostParam) -> Result<MyResult, actix_web::Error> {
-        match self.team_repository.get_by_encrypt_code(param.encrypt_code).await {
-            Ok(mut team) => {
-                let team = &mut team;
-                let mut result = MyResult {
-                    team_id: team.id,
-                    data: team.clone().pick_content,
-                    time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
-                    logs: self.log_repository.get_by_team_id(team.id).await.unwrap(),
-                };
-                self.check_team_is_picked(team, &mut result).await;
-                Ok(result)
-            }
-            Err(e) => Err(actix_web::error::ErrorInternalServerError(e))
-        }
+        let mut team = self.team_repository.get_by_encrypt_code(param.encrypt_code).await
+            .map_err(actix_web::error::ErrorInternalServerError)?;
+
+        let mut result = MyResult {
+            team_id: team.id,
+            data: team.pick_content.clone(),
+            time: current_time(),
+            logs: self.log_repository.get_by_team_id(team.id).await
+                .expect("Failed to get logs"),
+        };
+
+        self.check_team_is_picked(&mut team, &mut result).await;
+        Ok(result)
     }
 }
 
 impl PickServiceImpl {
     async fn check_team_is_picked(&self, team: &mut Team, result: &mut MyResult) {
         if !team.is_picked {
-            let pick_heroes = self.hero_repository.get_not_is_pick().await.expect("get hero error");
-            let pick_result = &self.get_pick_result(pick_heroes).await;
+            let pick_heroes = self.hero_repository.get_not_is_pick().await
+                .expect("pick heroes failed");
+
+            let pick_result = self.get_pick_result(pick_heroes).await;
             result.data = pick_result.clone();
-            self.save_result_for_log(team.id, pick_result).await;
-            self.update_team_is_picked(team, pick_result).await;
+
+            self.save_result_for_log(team.id, &pick_result).await;
+            self.update_team_is_picked(team, &pick_result).await;
         }
     }
 
-    async fn get_pick_result(&self, mut pick_heroes: Vec<Hero>) -> String {
-        for hero in &mut pick_heroes {
+    async fn get_pick_result(&self, mut heroes: Vec<Hero>) -> String {
+        for hero in &mut heroes {
             hero.is_pick = true;
             self.hero_repository.save(hero.clone()).await.expect("save hero failed");
         }
-        let heroes_names: Vec<String> = pick_heroes.into_iter().map(|hero| hero.name).collect();
-        let first_group = &heroes_names[0..HEROES_AMOUNT / 2].join(",");
-        let second_group = &heroes_names[HEROES_AMOUNT / 2..HEROES_AMOUNT].join(",");
-        format!("[{}]or[{}]", first_group, second_group)
+
+        let names: Vec<String> = heroes.into_iter().map(|hero| hero.name).collect();
+        format!("[{}]or[{}]",
+                names[..HEROES_AMOUNT / 2].join(","),
+                names[HEROES_AMOUNT / 2..].join(","))
     }
+
 
     async fn update_team_is_picked(&self, team: &mut Team, pick_result: &String) {
         team.is_picked = true;
         team.pick_content = pick_result.clone();
-        team.update_time = Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local();
-        self.team_repository.save(team.clone()).await.expect("save team failed");
+        team.update_time = current_time();
+        self.team_repository.save(team.clone()).await
+            .expect("save team failed");
     }
 
     async fn save_result_for_log(&self, team_index: i32, pick_result: &String) {
         let log = Log {
             team_id: team_index,
             pick_group: pick_result.clone(),
-            time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
+            time: current_time(),
         };
-        self.log_repository.save(log).await.expect("save log failed");
+        self.log_repository.save(log).await
+            .expect("save log failed");
     }
 }
 
 const HEROES_AMOUNT: usize = 4;
+
+fn current_time() -> NaiveDateTime {
+    Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local()
+}
