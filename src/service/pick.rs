@@ -67,9 +67,9 @@ impl PickServiceImpl {
             hero.is_pick = true;
             self.hero_repository.save(hero.clone()).await.expect("save hero failed");
         }
-        let names: Vec<String> = pick_heroes.into_iter().map(|hero| hero.name).collect();
-        let first_group = &names[0..2].join(",");
-        let second_group = &names[2..4].join(",");
+        let heroes_names: Vec<String> = pick_heroes.into_iter().map(|hero| hero.name).collect();
+        let first_group = &heroes_names[0..HEROES_AMOUNT / 2].join(",");
+        let second_group = &heroes_names[HEROES_AMOUNT / 2..HEROES_AMOUNT].join(",");
         format!("[{}]or[{}]", first_group, second_group)
     }
 
@@ -89,3 +89,5 @@ impl PickServiceImpl {
         self.log_repository.save(log).await.expect("save log failed");
     }
 }
+
+const HEROES_AMOUNT: usize = 4;
