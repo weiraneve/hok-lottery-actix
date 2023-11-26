@@ -29,14 +29,14 @@ See [lottery sql info](./sql) for more sql info
 
 ## architecture overview
 
-my actix `The Onion Architecture`:
+my actix `The Layered Architecture`:
 
 ```
 src
 ├── controller
 │     ├── mod.rs
-│     ├── pick_controller.rs
-│     └── reset_controller.rs
+│     ├── pick.rs
+│     └── reset.rs
 ├── model
 │     ├── hero.rs
 │     ├── log_response.rs
