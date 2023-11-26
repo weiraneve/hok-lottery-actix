@@ -42,13 +42,13 @@ impl ResetService for ResetServiceImpl {
     async fn reset_one_team(&self, id: i32) -> Result<MyResult, actix_web::Error> {
         match self.team_repository.get_by_id(id).await {
             Ok(()) => {
-                self.team_repository.reset_one(id).await.expect("reset one team failed");
-                Ok(Self::create_result(format!("刷新队伍{}成功", id)))
+                self.team_repository.reset_one(id).await.expect(RESET_ONE_TEAM_FAILED_ERROR);
+                Ok(Self::create_result(format!("{}{}{}", RESET_ONE_TEAM_MESSAGE, id, RESET_ONE_TEAM_SUCCESS)))
             }
             Err(e) => {
                 let message = match e {
-                    sqlx::Error::RowNotFound => "未有查询到此队伍".to_string(),
-                    _ => format!("处理时遇到错误：{}", e),
+                    sqlx::Error::RowNotFound => TEAM_NOT_FOUND_MESSAGE.to_string(),
+                    _ => format!("{}: {}", ERROR_PROCESSING_MESSAGE, e),
                 };
                 Ok(Self::create_result(message))
             }
@@ -56,16 +56,26 @@ impl ResetService for ResetServiceImpl {
     }
 
     async fn reset_all_teams(&self) -> Result<MyResult, actix_web::Error> {
-        self.team_repository.reset_all().await.expect("reset all teams failed");
-        Ok(Self::create_result("重置所有队伍成功".to_string()))
+        self.team_repository.reset_all().await.expect(RESET_ALL_TEAMS_FAILED_ERROR);
+        Ok(Self::create_result(RESET_ALL_TEAMS_SUCCESS_MESSAGE.to_string()))
     }
 
     async fn reset_all_heroes(&self) -> Result<MyResult, actix_web::Error> {
-        self.hero_repository.reset().await.expect("reset all heroes failed");
-        Ok(Self::create_result("重置所有英雄成功".to_string()))
+        self.hero_repository.reset().await.expect(RESET_ALL_HEROES_FAILED_ERROR);
+        Ok(Self::create_result(RESET_ALL_HEROES_SUCCESS_MESSAGE.to_string()))
     }
 }
 
 fn current_time() -> NaiveDateTime {
     Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local()
 }
+
+const RESET_ONE_TEAM_FAILED_ERROR: &str = "reset one team failed";
+const RESET_ALL_TEAMS_FAILED_ERROR: &str = "reset all teams failed";
+const RESET_ALL_HEROES_FAILED_ERROR: &str = "reset all heroes failed";
+const TEAM_NOT_FOUND_MESSAGE: &str = "未有查询到此队伍";
+const ERROR_PROCESSING_MESSAGE: &str = "处理时遇到错误";
+const RESET_ONE_TEAM_MESSAGE: &str = "刷新队伍";
+const RESET_ONE_TEAM_SUCCESS: &str = "成功";
+const RESET_ALL_TEAMS_SUCCESS_MESSAGE: &str = "重置所有队伍成功";
+const RESET_ALL_HEROES_SUCCESS_MESSAGE: &str = "重置所有英雄成功";

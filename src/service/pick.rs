@@ -44,7 +44,7 @@ impl PickService for PickServiceImpl {
             data: team.pick_content.clone(),
             time: current_time(),
             logs: self.log_repository.get_by_team_id(team.id).await
-                .expect("Failed to get logs"),
+                .expect(GET_LOGS_FAILED_ERROR),
         };
 
         self.check_team_is_picked(&mut team, &mut result).await;
@@ -56,7 +56,7 @@ impl PickServiceImpl {
     async fn check_team_is_picked(&self, team: &mut Team, result: &mut MyResult) {
         if !team.is_picked {
             let pick_heroes = self.hero_repository.get_not_is_pick().await
-                .expect("pick heroes failed");
+                .expect(PICK_HEROES_FAILED_ERROR);
 
             let pick_result = self.get_pick_result(pick_heroes).await;
             result.data = pick_result.clone();
@@ -69,7 +69,7 @@ impl PickServiceImpl {
     async fn get_pick_result(&self, mut heroes: Vec<Hero>) -> String {
         for hero in &mut heroes {
             hero.is_pick = true;
-            self.hero_repository.save(hero.clone()).await.expect("save hero failed");
+            self.hero_repository.save(hero.clone()).await.expect(SAVE_HERO_FAILED_ERROR);
         }
 
         let names: Vec<String> = heroes.into_iter().map(|hero| hero.name).collect();
@@ -84,7 +84,7 @@ impl PickServiceImpl {
         team.pick_content = pick_result.clone();
         team.update_time = current_time();
         self.team_repository.save(team.clone()).await
-            .expect("save team failed");
+            .expect(SAVE_TEAM_FAILED_ERROR);
     }
 
     async fn save_result_for_log(&self, team_index: i32, pick_result: &String) {
@@ -94,12 +94,17 @@ impl PickServiceImpl {
             time: current_time(),
         };
         self.log_repository.save(log).await
-            .expect("save log failed");
+            .expect(SAVE_LOG_FAILED_ERROR);
     }
 }
-
-const HEROES_AMOUNT: usize = 4;
 
 fn current_time() -> NaiveDateTime {
     Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local()
 }
+
+const GET_LOGS_FAILED_ERROR: &str = "Failed to get logs";
+const PICK_HEROES_FAILED_ERROR: &str = "pick heroes failed";
+const SAVE_HERO_FAILED_ERROR: &str = "save hero failed";
+const SAVE_TEAM_FAILED_ERROR: &str = "save team failed";
+const SAVE_LOG_FAILED_ERROR: &str = "save log failed";
+const HEROES_AMOUNT: usize = 4;
