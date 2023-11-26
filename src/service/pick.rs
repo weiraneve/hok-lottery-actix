@@ -14,7 +14,7 @@ use crate::repository::team::TeamRepository;
 
 #[async_trait]
 pub trait PickService: Sync + Send {
-    async fn pick(&self, param: PostParam) -> Result<MyResult, actix_web::Error>;
+    async fn pick_heroes(&self, param: PostParam) -> Result<MyResult, actix_web::Error>;
 }
 
 pub struct PickServiceImpl {
@@ -35,7 +35,7 @@ impl PickServiceImpl {
 
 #[async_trait]
 impl PickService for PickServiceImpl {
-    async fn pick(&self, param: PostParam) -> Result<MyResult, actix_web::Error> {
+    async fn pick_heroes(&self, param: PostParam) -> Result<MyResult, actix_web::Error> {
         let mut team = self.team_repository.get_by_encrypt_code(param.encrypt_code).await
             .map_err(actix_web::error::ErrorInternalServerError)?;
 

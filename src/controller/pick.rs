@@ -12,6 +12,6 @@ async fn pick_heroes(
     web::Json(param): web::Json<PostParam>,
     app_state: web::Data<AppState>,
 ) -> actix_web::Result<impl Responder> {
-    let response_data = app_state.service.pick.pick(param).await?;
+    let response_data = app_state.service.pick.pick_heroes(param).await?;
     Ok(web::Json(response_data))
 }
