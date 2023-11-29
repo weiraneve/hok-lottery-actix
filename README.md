@@ -33,29 +33,39 @@ my actix `The Layered Architecture`:
 
 ```
 src
-├── controller
-│     ├── mod.rs
-│     ├── pick.rs
-│     └── reset.rs
-├── model
-│     ├── hero.rs
-│     ├── log_response.rs
-│     ├── mod.rs
-│     ├── my_result.rs
-│     ├── post_param.rs
-│     ├── team.rs
-│     └── team_query.rs
-├── repository
-│     ├── hero.rs
-│     ├── log.rs
-│     ├── mod.rs
-│     └── team.rs
-├── service
-│     ├── mod.rs
-│     ├── pick.rs
-│     └── reset.rs
 ├── app_state.rs
+├── controller
+│  ├── mod.rs
+│  ├── pick.rs
+│  └── reset.rs
 ├── creat_app.rs
 ├── lib.rs
 ├── main.rs
+├── model
+│  ├── hero.rs
+│  ├── log_response.rs
+│  ├── mod.rs
+│  ├── my_result.rs
+│  ├── post_param.rs
+│  ├── team.rs
+│  └── team_query.rs
+├── repository
+│  ├── hero.rs
+│  ├── log.rs
+│  ├── mod.rs
+│  └── team.rs
+├── service
+│  ├── mod.rs
+│  ├── pick.rs
+│  └── reset.rs
+└── test
+    ├── mod.rs
+    └── test_controller.rs
+```
+
+## testing support
+
+To run the tests, you can go `src/test` and use the following command:
+```bash
+cargo test
 ```
