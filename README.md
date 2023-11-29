@@ -69,3 +69,5 @@ To run the tests, you can go `src/test` and use the following command:
 ```bash
 cargo test
 ```
+
+later iteration maybe use `mockall`
