@@ -870,7 +870,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sqlx",
- "tokio",
 ]
 
 [[package]]
