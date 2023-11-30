@@ -15,14 +15,21 @@ See [lottery sql info](./sql) for more sql info
 ## usages
 
 1. Create database and tables, you can see it by [lottery sql](./sql).
-   this can be done in the terminal:
+   this can be done in the terminal, then input your mysql root password four times.:
      ```shell
-     mysql -u root -p lottery < ./sql/lottery.sql
+     ./sql/import_databases.sh
      ```
+   
+   If you don't want to test sql and use the shell script, you can create mysql database and use:
+   ```shell
+   mysql -u root -p lottery < ./sql/lottery.sql
+   ```
+   
 2. Create a `.env` file in this directory:
     ```ini
     SERVER_ADDR=127.0.0.1:8034
     DATABASE_URL=mysql://<username>:<password>@localhost:3306/lottery
+    DATABASE_URL_TEST=mysql://<username>:<password>@localhost:3306/lottery_test
     ```
 
 3. Run the server
@@ -60,7 +67,8 @@ src
 │  └── reset.rs
 └── test
     ├── mod.rs
-    └── test_controller.rs
+    ├── test_pick_controller.rs
+    └── test_team_repository.rs
 ```
 
 ## testing support
@@ -69,5 +77,3 @@ To run the tests, you can go `src/test` and use the following command:
 ```bash
 cargo test
 ```
-
-later iteration maybe use `mockall`
