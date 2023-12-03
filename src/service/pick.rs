@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use chrono::{FixedOffset, NaiveDateTime, Utc};
 
 use crate::model::hero::Hero;
-use crate::model::log_response::Log;
+use crate::model::log::Log;
 use crate::model::my_result::MyResult;
 use crate::model::post_param::PostParam;
 use crate::model::team::Team;

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use async_trait::async_trait;
 use sqlx::MySqlPool;
 
-use crate::model::log_response::Log;
+use crate::model::log::Log;
 
 #[async_trait]
 pub trait LogRepository: Send + Sync {
