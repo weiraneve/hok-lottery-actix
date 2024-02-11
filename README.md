@@ -1,8 +1,8 @@
 # abstract
 
-This is a easy actix-web project.Just lottery hero for HOK. And same logic project [clean architecture](https://github.com/weiraneve/actix-clean-architecture)
+This is an easy actix-web project.Just lottery hero for HOK. And same logic project [clean architecture](https://github.com/weiraneve/actix-clean-architecture)
 
-I hava kotlin SpringBoot project as some logic [hok-lottery](https://github.com/weiraneve/hok-lottery)
+I have kotlin SpringBoot project as some logic [hok-lottery](https://github.com/weiraneve/hok-lottery)
 
 ## apis
 
