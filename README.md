@@ -31,8 +31,15 @@ See [lottery sql info](./sql) for more sql info
     DATABASE_URL=mysql://<username>:<password>@localhost:3306/lottery
     DATABASE_URL_TEST=mysql://<username>:<password>@localhost:3306/lottery_test
     ```
+   or use shell script:
+   ```shell
+   echo "SERVER_ADDR=127.0.0.1:8034" >> .env
+   echo "DATABASE_URL=mysql://<username>:<password>@localhost:3306/lottery" >> .env
+   echo "DATABASE_URL_TEST=mysql://<username>:<password>@localhost:3306/lottery_test" >> .env
+   ```
+   Maybe you shouldn't use test db, then you can delete the test db shell script and env content.
 
-3. Run the server
+3. Run the server  `cargo run`
 
 ## architecture overview
 
