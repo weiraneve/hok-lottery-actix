@@ -102,7 +102,7 @@ fn current_time() -> NaiveDateTime {
     Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local()
 }
 
-const GET_LOGS_FAILED_ERROR: &str = "Failed to get logs";
+const GET_LOGS_FAILED_ERROR: &str = "failed to get logs";
 const PICK_HEROES_FAILED_ERROR: &str = "pick heroes failed";
 const SAVE_HERO_FAILED_ERROR: &str = "save hero failed";
 const SAVE_TEAM_FAILED_ERROR: &str = "save team failed";
