@@ -1,5 +1,5 @@
 use serde::{Deserialize, Serialize};
-use sqlx::{FromRow, types::chrono::NaiveDateTime};
+use sqlx::{types::chrono::NaiveDateTime, FromRow};
 
 #[derive(Debug, Serialize, Deserialize, FromRow, Clone)]
 pub struct Log {

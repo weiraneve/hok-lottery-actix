@@ -1,6 +1,6 @@
+use crate::model::log::Log;
 use serde::{Deserialize, Serialize};
 use sqlx::types::chrono::NaiveDateTime;
-use crate::model::log::Log;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct MyResult {

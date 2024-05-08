@@ -1,4 +1,4 @@
-use actix_web::{get, Responder, web};
+use actix_web::{get, web, Responder};
 
 use crate::app_state::AppState;
 use crate::model::team_query::TeamQuery;

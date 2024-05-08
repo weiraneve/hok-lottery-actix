@@ -38,15 +38,16 @@ mod test {
     async fn test_save_team() {
         let pool = setup_database().await.expect("Failed to setup database");
         let team_repository = Arc::new(TeamRepositoryImpl::new(Arc::new(pool.clone())));
-        let team = team_repository.save(
-            Team {
+        let team = team_repository
+            .save(Team {
                 id: 9,
                 encrypt_code: String::from("asd"),
                 pick_content: String::from("[鲁班大师,白起]or[杨戬,雅典娜]"),
                 is_picked: true,
-                update_time: Utc::now().with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap()).naive_local(),
-            }
-        )
+                update_time: Utc::now()
+                    .with_timezone(&FixedOffset::east_opt(8 * 3600).unwrap())
+                    .naive_local(),
+            })
             .await
             .unwrap_or_else(|err| panic!("Failed to save team: {}", err));
 
@@ -58,6 +59,8 @@ mod test {
 
         assert_eq!(team.id, 9);
 
-        cleanup_database(&pool).await.expect("Failed to cleanup database");
+        cleanup_database(&pool)
+            .await
+            .expect("Failed to cleanup database");
     }
 }
