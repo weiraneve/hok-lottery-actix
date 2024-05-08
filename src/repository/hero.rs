@@ -44,7 +44,7 @@ impl HeroRepository for HeroRepositoryImpl {
         )
         .bind(hero.id)
         .bind(&hero.name)
-        .bind(&hero.line)
+        .bind(hero.line)
         .bind(hero.is_pick)
         .execute(&*self.pool)
         .await?;
